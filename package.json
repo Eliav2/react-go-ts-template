@@ -1,0 +1,13 @@
+{
+  "name": "try-demo-users-portal",
+  "version": "1.0.0",
+  "description": "a simple todo app to practice the following technologies: - backend: hono with bun as runtime - database: postgres with kysely for type safety - frontend: react SPA",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "dev": "pnpm -r run dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
