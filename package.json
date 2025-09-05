@@ -3,11 +3,21 @@
   "version": "1.0.0",
   "description": "a simple todo app to practice the following technologies: - backend: hono with bun as runtime - database: postgres with kysely for type safety - frontend: react SPA",
   "main": "index.js",
-  "devDependencies": {},
+  "devDependencies": {
+    "@eddeee888/gcg-typescript-resolver-files": "^0.12.1",
+    "@graphql-codegen/cli": "^5.0.7",
+    "@graphql-codegen/typescript": "^4.1.6",
+    "@graphql-codegen/typescript-operations": "^4.6.1",
+    "@graphql-codegen/typescript-react-query": "^6.1.1",
+    "@graphql-codegen/typescript-resolvers": "^4.5.2"
+  },
   "scripts": {
     "dev": "pnpm -r run dev"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "graphql-scalars": "^1.24.2"
+  }
 }
