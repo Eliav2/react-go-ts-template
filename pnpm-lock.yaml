@@ -8,9 +8,27 @@ importers:
 
   .:
     dependencies:
+      graphql:
+        specifier: ^16.11.0
+        version: 16.11.0
       graphql-scalars:
         specifier: ^1.24.2
         version: 1.24.2(graphql@16.11.0)
+
+  packages/backend:
+    dependencies:
+      dotenv:
+        specifier: ^17.2.2
+        version: 17.2.2
+      drizzle-orm:
+        specifier: ^0.44.5
+        version: 0.44.5(@types/pg@8.15.5)(bun-types@1.2.21(@types/react@19.1.12))(pg@8.16.3)
+      hono:
+        specifier: ^4.9.6
+        version: 4.9.6
+      pg:
+        specifier: ^8.16.3
+        version: 8.16.3
     devDependencies:
       '@eddeee888/gcg-typescript-resolver-files':
         specifier: ^0.12.1
@@ -30,22 +48,6 @@ importers:
       '@graphql-codegen/typescript-resolvers':
         specifier: ^4.5.2
         version: 4.5.2(graphql@16.11.0)
-
-  packages/backend:
-    dependencies:
-      dotenv:
-        specifier: ^17.2.2
-        version: 17.2.2
-      drizzle-orm:
-        specifier: ^0.44.5
-        version: 0.44.5(@types/pg@8.15.5)(bun-types@1.2.21(@types/react@19.1.12))(pg@8.16.3)
-      hono:
-        specifier: ^4.9.6
-        version: 4.9.6
-      pg:
-        specifier: ^8.16.3
-        version: 8.16.3
-    devDependencies:
       '@types/bun':
         specifier: latest
         version: 1.2.21(@types/react@19.1.12)

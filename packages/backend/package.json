@@ -13,6 +13,12 @@
     "@types/bun": "latest",
     "@types/pg": "^8.15.5",
     "drizzle-kit": "^0.31.4",
-    "tsx": "^4.20.5"
+    "tsx": "^4.20.5",
+    "@eddeee888/gcg-typescript-resolver-files": "^0.12.1",
+    "@graphql-codegen/cli": "^5.0.7",
+    "@graphql-codegen/typescript": "^4.1.6",
+    "@graphql-codegen/typescript-operations": "^4.6.1",
+    "@graphql-codegen/typescript-react-query": "^6.1.1",
+    "@graphql-codegen/typescript-resolvers": "^4.5.2"
   }
 }
