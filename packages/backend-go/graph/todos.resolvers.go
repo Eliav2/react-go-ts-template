@@ -6,6 +6,7 @@ package graph
 
 import (
 	"backend-go/ent"
+	"backend-go/ent/todo"
 	"backend-go/graph/generated"
 	"backend-go/graph/model"
 	"context"
@@ -14,43 +15,38 @@ import (
 	"github.com/google/uuid"
 )
 
-// Helper function to convert Ent Todo to GraphQL model
-func entTodoToModel(entTodo *ent.Todo) *model.Todo {
-	return &model.Todo{
-		ID:        entTodo.ID.String(),
-		Title:     entTodo.Title,
-		Completed: entTodo.Completed,
-	}
-}
-
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.CreateTodoInput) (*model.Todo, error) {
-	entTodo, err := r.Client.Todo.
-		Create().
-		SetTitle(input.Title).
-		Save(ctx)
+	// Use upstream mapper to prepare the creation operation
+	createQuery := upstreamCreateTodoMapper(r.Client, input)
 
+	entTodo, err := createQuery.Save(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create todo: %w", err)
 	}
 
-	return entTodoToModel(entTodo), nil
+	// Reload with user relationship if user was set
+	if input.UserID != nil {
+		entTodo, err = r.Client.Todo.
+			Query().
+			Where(todo.ID(entTodo.ID)).
+			WithUser().
+			Only(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("failed to reload todo with user: %w", err)
+		}
+	}
+
+	// Use downstream mapper to convert to GraphQL model
+	return downstreamTodoMapper(entTodo), nil
 }
 
 // UpdateTodo is the resolver for the updateTodo field.
 func (r *mutationResolver) UpdateTodo(ctx context.Context, input model.UpdateTodoInput) (*model.Todo, error) {
-	todoID, err := uuid.Parse(input.ID)
+	// Use upstream mapper to prepare the update operation
+	updateQuery, err := upstreamUpdateTodoMapper(r.Client, input)
 	if err != nil {
-		return nil, fmt.Errorf("invalid todo ID: %w", err)
-	}
-
-	updateQuery := r.Client.Todo.UpdateOneID(todoID)
-
-	if input.Title != nil {
-		updateQuery = updateQuery.SetTitle(*input.Title)
-	}
-	if input.Done != nil {
-		updateQuery = updateQuery.SetCompleted(*input.Done)
+		return nil, err
 	}
 
 	entTodo, err := updateQuery.Save(ctx)
@@ -61,7 +57,8 @@ func (r *mutationResolver) UpdateTodo(ctx context.Context, input model.UpdateTod
 		return nil, fmt.Errorf("failed to update todo: %w", err)
 	}
 
-	return entTodoToModel(entTodo), nil
+	// Use downstream mapper to convert to GraphQL model
+	return downstreamTodoMapper(entTodo), nil
 }
 
 // DeleteTodo is the resolver for the deleteTodo field.
@@ -84,14 +81,17 @@ func (r *mutationResolver) DeleteTodo(ctx context.Context, id string) (bool, err
 
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	entTodos, err := r.Client.Todo.Query().All(ctx)
+	entTodos, err := r.Client.Todo.Query().
+		WithUser(). // Load user relationship
+		All(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query todos: %w", err)
 	}
 
+	// Use downstream mapper to convert to GraphQL models
 	todos := make([]*model.Todo, len(entTodos))
 	for i, entTodo := range entTodos {
-		todos[i] = entTodoToModel(entTodo)
+		todos[i] = downstreamTodoMapper(entTodo)
 	}
 
 	return todos, nil

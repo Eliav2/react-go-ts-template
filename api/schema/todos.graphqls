@@ -6,10 +6,13 @@ type Todo {
   id: ID!
   title: String!
   completed: Boolean!
+  user: User
+  userId: ID
 }
 
 input CreateTodoInput {
   title: String!
+  userId: ID
 }
 
 input UpdateTodoInput {

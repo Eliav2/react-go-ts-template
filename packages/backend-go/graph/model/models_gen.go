@@ -3,7 +3,13 @@
 package model
 
 type CreateTodoInput struct {
-	Title string `json:"title"`
+	Title  string  `json:"title"`
+	UserID *string `json:"userId,omitempty"`
+}
+
+type CreateUserInput struct {
+	Email string `json:"email"`
+	Name  string `json:"name"`
 }
 
 type Mutation struct {
@@ -13,13 +19,28 @@ type Query struct {
 }
 
 type Todo struct {
-	ID        string `json:"id"`
-	Title     string `json:"title"`
-	Completed bool   `json:"completed"`
+	ID        string  `json:"id"`
+	Title     string  `json:"title"`
+	Completed bool    `json:"completed"`
+	User      *User   `json:"user,omitempty"`
+	UserID    *string `json:"userId,omitempty"`
 }
 
 type UpdateTodoInput struct {
 	ID    string  `json:"id"`
 	Title *string `json:"title,omitempty"`
 	Done  *bool   `json:"done,omitempty"`
+}
+
+type UpdateUserInput struct {
+	ID    string  `json:"id"`
+	Email *string `json:"email,omitempty"`
+	Name  *string `json:"name,omitempty"`
+}
+
+type User struct {
+	ID    string  `json:"id"`
+	Email string  `json:"email"`
+	Name  string  `json:"name"`
+	Todos []*Todo `json:"todos"`
 }
