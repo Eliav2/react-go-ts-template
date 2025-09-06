@@ -1,3 +1,6 @@
+import type { MutationResolvers } from "./../types.generated";
 
-        import type   { MutationResolvers } from './../types.generated';
-        export const deleteTodo: NonNullable<MutationResolvers['deleteTodo']> = async (_parent, _arg, _ctx) => { /* Implement Mutation.deleteTodo resolver logic here */ };
+export const deleteTodo: NonNullable<MutationResolvers["deleteTodo"]> = async (_parent, { id }, _ctx) => {
+  // Basic implementation - always returns true for now
+  return true;
+};

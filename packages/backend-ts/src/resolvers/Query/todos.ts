@@ -1,3 +1,6 @@
+import type { QueryResolvers } from "./../types.generated";
 
-        import type   { QueryResolvers } from './../types.generated';
-        export const todos: NonNullable<QueryResolvers['todos']> = async (_parent, _arg, _ctx) => { /* Implement Query.todos resolver logic here */ };
+export const todos: NonNullable<QueryResolvers["todos"]> = async (_parent, _arg, _ctx) => {
+  // Basic implementation - returns empty array for now
+  return [];
+};
