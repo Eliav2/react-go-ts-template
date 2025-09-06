@@ -2,7 +2,7 @@
 
 # Development server with hot reload
 dev:
-	go run main.go
+	@if [ -f .env ]; then export $$(cat .env | xargs); fi && go run main.go
 
 # Build the application
 build:

@@ -3,6 +3,7 @@
 package generated
 
 import (
+	"backend-go/graph/model"
 	"bytes"
 	"context"
 	"errors"
@@ -13,7 +14,6 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
-	"github.com/eliav/exercise-drizzle-react/packages/backend-go/graph/model"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -298,7 +298,7 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 func (ec *executionContext) field_Mutation_createTodo_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateTodoInput2githubᚗcomᚋeliavᚋexerciseᚑdrizzleᚑreactᚋpackagesᚋbackendᚑgoᚋgraphᚋmodelᚐCreateTodoInput)
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateTodoInput2backendᚑgoᚋgraphᚋmodelᚐCreateTodoInput)
 	if err != nil {
 		return nil, err
 	}
@@ -320,7 +320,7 @@ func (ec *executionContext) field_Mutation_deleteTodo_args(ctx context.Context, 
 func (ec *executionContext) field_Mutation_updateTodo_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateTodoInput2githubᚗcomᚋeliavᚋexerciseᚑdrizzleᚑreactᚋpackagesᚋbackendᚑgoᚋgraphᚋmodelᚐUpdateTodoInput)
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateTodoInput2backendᚑgoᚋgraphᚋmodelᚐUpdateTodoInput)
 	if err != nil {
 		return nil, err
 	}
@@ -419,7 +419,7 @@ func (ec *executionContext) _Mutation_createTodo(ctx context.Context, field grap
 	}
 	res := resTmp.(*model.Todo)
 	fc.Result = res
-	return ec.marshalNTodo2ᚖgithubᚗcomᚋeliavᚋexerciseᚑdrizzleᚑreactᚋpackagesᚋbackendᚑgoᚋgraphᚋmodelᚐTodo(ctx, field.Selections, res)
+	return ec.marshalNTodo2ᚖbackendᚑgoᚋgraphᚋmodelᚐTodo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createTodo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -482,7 +482,7 @@ func (ec *executionContext) _Mutation_updateTodo(ctx context.Context, field grap
 	}
 	res := resTmp.(*model.Todo)
 	fc.Result = res
-	return ec.marshalNTodo2ᚖgithubᚗcomᚋeliavᚋexerciseᚑdrizzleᚑreactᚋpackagesᚋbackendᚑgoᚋgraphᚋmodelᚐTodo(ctx, field.Selections, res)
+	return ec.marshalNTodo2ᚖbackendᚑgoᚋgraphᚋmodelᚐTodo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateTodo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -600,7 +600,7 @@ func (ec *executionContext) _Query_todos(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.([]*model.Todo)
 	fc.Result = res
-	return ec.marshalNTodo2ᚕᚖgithubᚗcomᚋeliavᚋexerciseᚑdrizzleᚑreactᚋpackagesᚋbackendᚑgoᚋgraphᚋmodelᚐTodoᚄ(ctx, field.Selections, res)
+	return ec.marshalNTodo2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐTodoᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_todos(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3449,7 +3449,7 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) unmarshalNCreateTodoInput2githubᚗcomᚋeliavᚋexerciseᚑdrizzleᚑreactᚋpackagesᚋbackendᚑgoᚋgraphᚋmodelᚐCreateTodoInput(ctx context.Context, v any) (model.CreateTodoInput, error) {
+func (ec *executionContext) unmarshalNCreateTodoInput2backendᚑgoᚋgraphᚋmodelᚐCreateTodoInput(ctx context.Context, v any) (model.CreateTodoInput, error) {
 	res, err := ec.unmarshalInputCreateTodoInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -3486,11 +3486,11 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) marshalNTodo2githubᚗcomᚋeliavᚋexerciseᚑdrizzleᚑreactᚋpackagesᚋbackendᚑgoᚋgraphᚋmodelᚐTodo(ctx context.Context, sel ast.SelectionSet, v model.Todo) graphql.Marshaler {
+func (ec *executionContext) marshalNTodo2backendᚑgoᚋgraphᚋmodelᚐTodo(ctx context.Context, sel ast.SelectionSet, v model.Todo) graphql.Marshaler {
 	return ec._Todo(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNTodo2ᚕᚖgithubᚗcomᚋeliavᚋexerciseᚑdrizzleᚑreactᚋpackagesᚋbackendᚑgoᚋgraphᚋmodelᚐTodoᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Todo) graphql.Marshaler {
+func (ec *executionContext) marshalNTodo2ᚕᚖbackendᚑgoᚋgraphᚋmodelᚐTodoᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Todo) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -3514,7 +3514,7 @@ func (ec *executionContext) marshalNTodo2ᚕᚖgithubᚗcomᚋeliavᚋexercise�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNTodo2ᚖgithubᚗcomᚋeliavᚋexerciseᚑdrizzleᚑreactᚋpackagesᚋbackendᚑgoᚋgraphᚋmodelᚐTodo(ctx, sel, v[i])
+			ret[i] = ec.marshalNTodo2ᚖbackendᚑgoᚋgraphᚋmodelᚐTodo(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -3534,7 +3534,7 @@ func (ec *executionContext) marshalNTodo2ᚕᚖgithubᚗcomᚋeliavᚋexercise�
 	return ret
 }
 
-func (ec *executionContext) marshalNTodo2ᚖgithubᚗcomᚋeliavᚋexerciseᚑdrizzleᚑreactᚋpackagesᚋbackendᚑgoᚋgraphᚋmodelᚐTodo(ctx context.Context, sel ast.SelectionSet, v *model.Todo) graphql.Marshaler {
+func (ec *executionContext) marshalNTodo2ᚖbackendᚑgoᚋgraphᚋmodelᚐTodo(ctx context.Context, sel ast.SelectionSet, v *model.Todo) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -3544,7 +3544,7 @@ func (ec *executionContext) marshalNTodo2ᚖgithubᚗcomᚋeliavᚋexerciseᚑdr
 	return ec._Todo(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNUpdateTodoInput2githubᚗcomᚋeliavᚋexerciseᚑdrizzleᚑreactᚋpackagesᚋbackendᚑgoᚋgraphᚋmodelᚐUpdateTodoInput(ctx context.Context, v any) (model.UpdateTodoInput, error) {
+func (ec *executionContext) unmarshalNUpdateTodoInput2backendᚑgoᚋgraphᚋmodelᚐUpdateTodoInput(ctx context.Context, v any) (model.UpdateTodoInput, error) {
 	res, err := ec.unmarshalInputUpdateTodoInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }

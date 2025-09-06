@@ -1,17 +1,22 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 	"os"
 
+	"entgo.io/ent/dialect"
+	entsql "entgo.io/ent/dialect/sql"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gorilla/mux"
+	_ "github.com/lib/pq"
 	"github.com/rs/cors"
 
-	"github.com/eliav/exercise-drizzle-react/packages/backend-go/graph"
-	"github.com/eliav/exercise-drizzle-react/packages/backend-go/graph/generated"
+	"backend-go/ent"
+	"backend-go/graph"
+	"backend-go/graph/generated"
 )
 
 const defaultPort = "8080"
@@ -22,12 +27,33 @@ func main() {
 		port = defaultPort
 	}
 
-	// Create storage
-	todoStorage := graph.NewTodoStorage()
+	// Database connection
+	databaseURL := os.Getenv("DATABASE_URL")
+	if databaseURL == "" {
+		log.Fatal("DATABASE_URL environment variable is required")
+	}
 
-	// Create resolver with storage
+	// Open database connection
+	db, err := sql.Open("postgres", databaseURL)
+	if err != nil {
+		log.Fatalf("failed to connect to database: %v", err)
+	}
+	defer db.Close()
+
+	// Create Ent client
+	drv := entsql.OpenDB(dialect.Postgres, db)
+	client := ent.NewClient(ent.Driver(drv))
+	defer client.Close()
+
+	// Test database connection (disable auto-migration since TypeScript manages schema)
+	if err := db.Ping(); err != nil {
+		log.Fatalf("failed to ping database: %v", err)
+	}
+	log.Println("✅ Connected to PostgreSQL database")
+
+	// Create resolver with Ent client
 	resolver := &graph.Resolver{
-		TodoStorage: todoStorage,
+		Client: client,
 	}
 
 	// Create GraphQL server
