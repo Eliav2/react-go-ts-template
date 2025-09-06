@@ -10,5 +10,10 @@
       "username": "postgres",
       "connectString": "postgres://postgres:postgres@localhost:5432/postgres"
     }
-  ]
+  ],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }

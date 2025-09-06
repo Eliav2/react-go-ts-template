@@ -13,5 +13,8 @@
   "dependencies": {
     "graphql": "^16.11.0",
     "graphql-scalars": "^1.24.2"
+  },
+  "prettier": {
+    "tabWidth": 2
   }
 }

@@ -1,69 +1,114 @@
-# React + TypeScript + Vite
+# Frontend Todo Manager
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React frontend application for managing todos and users, built with modern web technologies.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React 19** - UI framework
+- **TanStack Router** - Type-safe routing
+- **TanStack Query** - Data fetching and caching
+- **TypeScript** - Type safety
+- **Vite** - Build tool
+- **GraphQL Codegen** - Automatic query hook generation
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Current Implementation (Part 1)
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- ✅ Modern layout with navigation
+- ✅ Routing between todos and users pages
+- ✅ Todos table with placeholder data
+- ✅ User assignment functionality (dropdown in table)
+- ✅ Toggle todo completion status
+- ✅ Users management page with CRUD operations
+- ✅ Responsive design with clean styling
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### Planned for Part 2
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- 🔄 GraphQL query integration
+- 🔄 Real data fetching from Go backend
+- 🔄 Automatic query hook generation
+- 🔄 Error handling and loading states
+
+## Project Structure
+
+```
+src/
+├── components/
+│   ├── TodosTable.tsx      # Main todos table with user assignment
+│   └── UsersPage.tsx       # User management with CRUD operations
+├── routes/
+│   ├── __root.tsx          # Root layout with navigation
+│   ├── index.tsx           # Todos page route
+│   └── users.tsx           # Users page route
+├── queries/                # GraphQL queries (Part 2)
+├── generated/              # Auto-generated query hooks (Part 2)
+└── main.tsx               # App entry point
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Available Scripts
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- `pnpm dev` - Start development server
+- `pnpm build` - Build for production
+- `pnpm lint` - Run ESLint
+- `pnpm codegen` - Generate GraphQL hooks (Part 2)
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Data Models
+
+### Todo
+
+- `id`: Unique identifier
+- `title`: Todo description
+- `completed`: Boolean status
+- `user`: Assigned user (optional)
+- `userId`: Assigned user ID (optional)
+
+### User
+
+- `id`: Unique identifier
+- `name`: User's full name
+- `email`: User's email address
+
+## Features Detail
+
+### Todos Table
+
+- View all todos in a clean table format
+- Assign/unassign users to todos via dropdown
+- Toggle completion status with one click
+- Visual status indicators (completed/pending)
+
+### Users Management
+
+- View all users in a table
+- Create new users with name and email
+- Edit existing user information
+- Delete users (with confirmation)
+- Automatic cleanup of todo assignments when user is deleted
+
+## Routing
+
+- `/` - Main todos table
+- `/users` - User management page
+
+Navigation is available in the top header with active state indicators.
+
+## Styling
+
+Clean, modern design with:
+
+- Responsive layout
+- Consistent color scheme
+- Hover effects and transitions
+- Form validation styling
+- Status indicators
+- Professional table design
+
+## Next Steps (Part 2)
+
+1. Create GraphQL query files in `src/queries/`
+2. Configure GraphQL endpoint in codegen
+3. Generate type-safe query hooks
+4. Replace placeholder data with real API calls
+5. Add error handling and loading states
+6. Implement optimistic updates for better UX
