@@ -4,6 +4,7 @@ package ent
 
 import (
 	"backend-go/ent/todo"
+	"backend-go/ent/user"
 	"fmt"
 	"strings"
 
@@ -20,8 +21,32 @@ type Todo struct {
 	// Title holds the value of the "title" field.
 	Title string `json:"title,omitempty"`
 	// Completed holds the value of the "completed" field.
-	Completed    bool `json:"completed,omitempty"`
+	Completed bool `json:"completed,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the TodoQuery when eager-loading is set.
+	Edges        TodoEdges `json:"edges"`
+	user_todos   *uuid.UUID
 	selectValues sql.SelectValues
+}
+
+// TodoEdges holds the relations/edges for other nodes in the graph.
+type TodoEdges struct {
+	// User holds the value of the user edge.
+	User *User `json:"user,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// UserOrErr returns the User value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e TodoEdges) UserOrErr() (*User, error) {
+	if e.User != nil {
+		return e.User, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: user.Label}
+	}
+	return nil, &NotLoadedError{edge: "user"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -35,6 +60,8 @@ func (*Todo) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case todo.FieldID:
 			values[i] = new(uuid.UUID)
+		case todo.ForeignKeys[0]: // user_todos
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -68,6 +95,13 @@ func (_m *Todo) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Completed = value.Bool
 			}
+		case todo.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field user_todos", values[i])
+			} else if value.Valid {
+				_m.user_todos = new(uuid.UUID)
+				*_m.user_todos = *value.S.(*uuid.UUID)
+			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -79,6 +113,11 @@ func (_m *Todo) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (_m *Todo) Value(name string) (ent.Value, error) {
 	return _m.selectValues.Get(name)
+}
+
+// QueryUser queries the "user" edge of the Todo entity.
+func (_m *Todo) QueryUser() *UserQuery {
+	return NewTodoClient(_m.config).QueryUser(_m)
 }
 
 // Update returns a builder for updating this Todo.

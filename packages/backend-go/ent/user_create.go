@@ -14,79 +14,67 @@ import (
 	"github.com/google/uuid"
 )
 
-// TodoCreate is the builder for creating a Todo entity.
-type TodoCreate struct {
+// UserCreate is the builder for creating a User entity.
+type UserCreate struct {
 	config
-	mutation *TodoMutation
+	mutation *UserMutation
 	hooks    []Hook
 }
 
-// SetTitle sets the "title" field.
-func (_c *TodoCreate) SetTitle(v string) *TodoCreate {
-	_c.mutation.SetTitle(v)
+// SetEmail sets the "email" field.
+func (_c *UserCreate) SetEmail(v string) *UserCreate {
+	_c.mutation.SetEmail(v)
 	return _c
 }
 
-// SetCompleted sets the "completed" field.
-func (_c *TodoCreate) SetCompleted(v bool) *TodoCreate {
-	_c.mutation.SetCompleted(v)
-	return _c
-}
-
-// SetNillableCompleted sets the "completed" field if the given value is not nil.
-func (_c *TodoCreate) SetNillableCompleted(v *bool) *TodoCreate {
-	if v != nil {
-		_c.SetCompleted(*v)
-	}
+// SetName sets the "name" field.
+func (_c *UserCreate) SetName(v string) *UserCreate {
+	_c.mutation.SetName(v)
 	return _c
 }
 
 // SetID sets the "id" field.
-func (_c *TodoCreate) SetID(v uuid.UUID) *TodoCreate {
+func (_c *UserCreate) SetID(v uuid.UUID) *UserCreate {
 	_c.mutation.SetID(v)
 	return _c
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (_c *TodoCreate) SetNillableID(v *uuid.UUID) *TodoCreate {
+func (_c *UserCreate) SetNillableID(v *uuid.UUID) *UserCreate {
 	if v != nil {
 		_c.SetID(*v)
 	}
 	return _c
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (_c *TodoCreate) SetUserID(id uuid.UUID) *TodoCreate {
-	_c.mutation.SetUserID(id)
+// AddTodoIDs adds the "todos" edge to the Todo entity by IDs.
+func (_c *UserCreate) AddTodoIDs(ids ...uuid.UUID) *UserCreate {
+	_c.mutation.AddTodoIDs(ids...)
 	return _c
 }
 
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (_c *TodoCreate) SetNillableUserID(id *uuid.UUID) *TodoCreate {
-	if id != nil {
-		_c = _c.SetUserID(*id)
+// AddTodos adds the "todos" edges to the Todo entity.
+func (_c *UserCreate) AddTodos(v ...*Todo) *UserCreate {
+	ids := make([]uuid.UUID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return _c
+	return _c.AddTodoIDs(ids...)
 }
 
-// SetUser sets the "user" edge to the User entity.
-func (_c *TodoCreate) SetUser(v *User) *TodoCreate {
-	return _c.SetUserID(v.ID)
-}
-
-// Mutation returns the TodoMutation object of the builder.
-func (_c *TodoCreate) Mutation() *TodoMutation {
+// Mutation returns the UserMutation object of the builder.
+func (_c *UserCreate) Mutation() *UserMutation {
 	return _c.mutation
 }
 
-// Save creates the Todo in the database.
-func (_c *TodoCreate) Save(ctx context.Context) (*Todo, error) {
+// Save creates the User in the database.
+func (_c *UserCreate) Save(ctx context.Context) (*User, error) {
 	_c.defaults()
 	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (_c *TodoCreate) SaveX(ctx context.Context) *Todo {
+func (_c *UserCreate) SaveX(ctx context.Context) *User {
 	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -95,47 +83,48 @@ func (_c *TodoCreate) SaveX(ctx context.Context) *Todo {
 }
 
 // Exec executes the query.
-func (_c *TodoCreate) Exec(ctx context.Context) error {
+func (_c *UserCreate) Exec(ctx context.Context) error {
 	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (_c *TodoCreate) ExecX(ctx context.Context) {
+func (_c *UserCreate) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (_c *TodoCreate) defaults() {
-	if _, ok := _c.mutation.Completed(); !ok {
-		v := todo.DefaultCompleted
-		_c.mutation.SetCompleted(v)
-	}
+func (_c *UserCreate) defaults() {
 	if _, ok := _c.mutation.ID(); !ok {
-		v := todo.DefaultID()
+		v := user.DefaultID()
 		_c.mutation.SetID(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (_c *TodoCreate) check() error {
-	if _, ok := _c.mutation.Title(); !ok {
-		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "Todo.title"`)}
+func (_c *UserCreate) check() error {
+	if _, ok := _c.mutation.Email(); !ok {
+		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "User.email"`)}
 	}
-	if v, ok := _c.mutation.Title(); ok {
-		if err := todo.TitleValidator(v); err != nil {
-			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Todo.title": %w`, err)}
+	if v, ok := _c.mutation.Email(); ok {
+		if err := user.EmailValidator(v); err != nil {
+			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "User.email": %w`, err)}
 		}
 	}
-	if _, ok := _c.mutation.Completed(); !ok {
-		return &ValidationError{Name: "completed", err: errors.New(`ent: missing required field "Todo.completed"`)}
+	if _, ok := _c.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "User.name"`)}
+	}
+	if v, ok := _c.mutation.Name(); ok {
+		if err := user.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "User.name": %w`, err)}
+		}
 	}
 	return nil
 }
 
-func (_c *TodoCreate) sqlSave(ctx context.Context) (*Todo, error) {
+func (_c *UserCreate) sqlSave(ctx context.Context) (*User, error) {
 	if err := _c.check(); err != nil {
 		return nil, err
 	}
@@ -158,64 +147,63 @@ func (_c *TodoCreate) sqlSave(ctx context.Context) (*Todo, error) {
 	return _node, nil
 }
 
-func (_c *TodoCreate) createSpec() (*Todo, *sqlgraph.CreateSpec) {
+func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Todo{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(todo.Table, sqlgraph.NewFieldSpec(todo.FieldID, field.TypeUUID))
+		_node = &User{config: _c.config}
+		_spec = sqlgraph.NewCreateSpec(user.Table, sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID))
 	)
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := _c.mutation.Title(); ok {
-		_spec.SetField(todo.FieldTitle, field.TypeString, value)
-		_node.Title = value
+	if value, ok := _c.mutation.Email(); ok {
+		_spec.SetField(user.FieldEmail, field.TypeString, value)
+		_node.Email = value
 	}
-	if value, ok := _c.mutation.Completed(); ok {
-		_spec.SetField(todo.FieldCompleted, field.TypeBool, value)
-		_node.Completed = value
+	if value, ok := _c.mutation.Name(); ok {
+		_spec.SetField(user.FieldName, field.TypeString, value)
+		_node.Name = value
 	}
-	if nodes := _c.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.TodosIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   todo.UserTable,
-			Columns: []string{todo.UserColumn},
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TodosTable,
+			Columns: []string{user.TodosColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+				IDSpec: sqlgraph.NewFieldSpec(todo.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.user_todos = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
 
-// TodoCreateBulk is the builder for creating many Todo entities in bulk.
-type TodoCreateBulk struct {
+// UserCreateBulk is the builder for creating many User entities in bulk.
+type UserCreateBulk struct {
 	config
 	err      error
-	builders []*TodoCreate
+	builders []*UserCreate
 }
 
-// Save creates the Todo entities in the database.
-func (_c *TodoCreateBulk) Save(ctx context.Context) ([]*Todo, error) {
+// Save creates the User entities in the database.
+func (_c *UserCreateBulk) Save(ctx context.Context) ([]*User, error) {
 	if _c.err != nil {
 		return nil, _c.err
 	}
 	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
-	nodes := make([]*Todo, len(_c.builders))
+	nodes := make([]*User, len(_c.builders))
 	mutators := make([]Mutator, len(_c.builders))
 	for i := range _c.builders {
 		func(i int, root context.Context) {
 			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-				mutation, ok := m.(*TodoMutation)
+				mutation, ok := m.(*UserMutation)
 				if !ok {
 					return nil, fmt.Errorf("unexpected mutation type %T", m)
 				}
@@ -258,7 +246,7 @@ func (_c *TodoCreateBulk) Save(ctx context.Context) ([]*Todo, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (_c *TodoCreateBulk) SaveX(ctx context.Context) []*Todo {
+func (_c *UserCreateBulk) SaveX(ctx context.Context) []*User {
 	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -267,13 +255,13 @@ func (_c *TodoCreateBulk) SaveX(ctx context.Context) []*Todo {
 }
 
 // Exec executes the query.
-func (_c *TodoCreateBulk) Exec(ctx context.Context) error {
+func (_c *UserCreateBulk) Exec(ctx context.Context) error {
 	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (_c *TodoCreateBulk) ExecX(ctx context.Context) {
+func (_c *UserCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}

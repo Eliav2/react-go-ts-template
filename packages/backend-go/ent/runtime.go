@@ -5,6 +5,7 @@ package ent
 import (
 	"backend-go/ent/schema"
 	"backend-go/ent/todo"
+	"backend-go/ent/user"
 
 	"github.com/google/uuid"
 )
@@ -41,4 +42,18 @@ func init() {
 	todoDescID := todoFields[0].Descriptor()
 	// todo.DefaultID holds the default value on creation for the id field.
 	todo.DefaultID = todoDescID.Default.(func() uuid.UUID)
+	userFields := schema.User{}.Fields()
+	_ = userFields
+	// userDescEmail is the schema descriptor for email field.
+	userDescEmail := userFields[1].Descriptor()
+	// user.EmailValidator is a validator for the "email" field. It is called by the builders before save.
+	user.EmailValidator = userDescEmail.Validators[0].(func(string) error)
+	// userDescName is the schema descriptor for name field.
+	userDescName := userFields[2].Descriptor()
+	// user.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	user.NameValidator = userDescName.Validators[0].(func(string) error)
+	// userDescID is the schema descriptor for id field.
+	userDescID := userFields[0].Descriptor()
+	// user.DefaultID holds the default value on creation for the id field.
+	user.DefaultID = userDescID.Default.(func() uuid.UUID)
 }

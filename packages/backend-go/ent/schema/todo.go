@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 )
@@ -28,9 +29,13 @@ func (Todo) Fields() []ent.Field {
 	}
 }
 
-// Edges of the Todo.
+// Edges of the Todo - Todo belongs to a user
 func (Todo) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("user", User.Type).
+			Ref("todos").
+			Unique(),
+	}
 }
 
 // Annotations configures Ent to use existing PostgreSQL table

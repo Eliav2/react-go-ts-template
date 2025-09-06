@@ -5,6 +5,7 @@ package ent
 import (
 	"backend-go/ent/predicate"
 	"backend-go/ent/todo"
+	"backend-go/ent/user"
 	"context"
 	"errors"
 	"fmt"
@@ -12,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // TodoUpdate is the builder for updating Todo entities.
@@ -55,9 +57,34 @@ func (_u *TodoUpdate) SetNillableCompleted(v *bool) *TodoUpdate {
 	return _u
 }
 
+// SetUserID sets the "user" edge to the User entity by ID.
+func (_u *TodoUpdate) SetUserID(id uuid.UUID) *TodoUpdate {
+	_u.mutation.SetUserID(id)
+	return _u
+}
+
+// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
+func (_u *TodoUpdate) SetNillableUserID(id *uuid.UUID) *TodoUpdate {
+	if id != nil {
+		_u = _u.SetUserID(*id)
+	}
+	return _u
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (_u *TodoUpdate) SetUser(v *User) *TodoUpdate {
+	return _u.SetUserID(v.ID)
+}
+
 // Mutation returns the TodoMutation object of the builder.
 func (_u *TodoUpdate) Mutation() *TodoMutation {
 	return _u.mutation
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (_u *TodoUpdate) ClearUser() *TodoUpdate {
+	_u.mutation.ClearUser()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -115,6 +142,35 @@ func (_u *TodoUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if value, ok := _u.mutation.Completed(); ok {
 		_spec.SetField(todo.FieldCompleted, field.TypeBool, value)
 	}
+	if _u.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   todo.UserTable,
+			Columns: []string{todo.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   todo.UserTable,
+			Columns: []string{todo.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{todo.Label}
@@ -163,9 +219,34 @@ func (_u *TodoUpdateOne) SetNillableCompleted(v *bool) *TodoUpdateOne {
 	return _u
 }
 
+// SetUserID sets the "user" edge to the User entity by ID.
+func (_u *TodoUpdateOne) SetUserID(id uuid.UUID) *TodoUpdateOne {
+	_u.mutation.SetUserID(id)
+	return _u
+}
+
+// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
+func (_u *TodoUpdateOne) SetNillableUserID(id *uuid.UUID) *TodoUpdateOne {
+	if id != nil {
+		_u = _u.SetUserID(*id)
+	}
+	return _u
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (_u *TodoUpdateOne) SetUser(v *User) *TodoUpdateOne {
+	return _u.SetUserID(v.ID)
+}
+
 // Mutation returns the TodoMutation object of the builder.
 func (_u *TodoUpdateOne) Mutation() *TodoMutation {
 	return _u.mutation
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (_u *TodoUpdateOne) ClearUser() *TodoUpdateOne {
+	_u.mutation.ClearUser()
+	return _u
 }
 
 // Where appends a list predicates to the TodoUpdate builder.
@@ -252,6 +333,35 @@ func (_u *TodoUpdateOne) sqlSave(ctx context.Context) (_node *Todo, err error) {
 	}
 	if value, ok := _u.mutation.Completed(); ok {
 		_spec.SetField(todo.FieldCompleted, field.TypeBool, value)
+	}
+	if _u.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   todo.UserTable,
+			Columns: []string{todo.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   todo.UserTable,
+			Columns: []string{todo.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Todo{config: _u.config}
 	_spec.Assign = _node.assignValues
