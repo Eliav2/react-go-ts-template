@@ -6,7 +6,8 @@ const config: CodegenConfig = {
   generates: {
     "src/resolvers": defineConfig({
       // generates resolver files + types; minimal == root fields only
-      resolverGeneration: "minimal",
+      resolverGeneration: "recommended",
+      mode: "merged",
       // typesPluginsConfig: { contextType: "../server/context#Context" },
     }),
   },
