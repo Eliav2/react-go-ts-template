@@ -7,11 +7,11 @@ export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Mayb
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 
-function fetcher<TData, TVariables>(endpoint: string, requestInit: RequestInit, query: string, variables?: TVariables) {
+function fetcher<TData, TVariables>(query: string, variables?: TVariables) {
   return async (): Promise<TData> => {
-    const res = await fetch(endpoint, {
-      method: 'POST',
-      ...requestInit,
+    const res = await fetch('/graphql' as string, {
+    method: "POST",
+    ...({"headers":{"Content-Type":"application/json"}}),
       body: JSON.stringify({ query, variables }),
     });
 
@@ -130,14 +130,14 @@ export type CreateTodoMutationVariables = Exact<{
 }>;
 
 
-export type CreateTodoMutation = { __typename?: 'Mutation', createTodo: { __typename?: 'Todo', id: string, title: string, completed: boolean, userId?: string | null, user?: { __typename?: 'User', id: string, name: string, email: string } | null } };
+export type CreateTodoMutation = { __typename?: 'Mutation', createTodo: { __typename?: 'Todo', id: string, title: string, completed: boolean, userId?: string | null } };
 
 export type UpdateTodoMutationVariables = Exact<{
   input: UpdateTodoInput;
 }>;
 
 
-export type UpdateTodoMutation = { __typename?: 'Mutation', updateTodo: { __typename?: 'Todo', id: string, title: string, completed: boolean, userId?: string | null, user?: { __typename?: 'User', id: string, name: string, email: string } | null } };
+export type UpdateTodoMutation = { __typename?: 'Mutation', updateTodo: { __typename?: 'Todo', id: string, title: string, completed: boolean, userId?: string | null } };
 
 export type DeleteTodoMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -149,21 +149,21 @@ export type DeleteTodoMutation = { __typename?: 'Mutation', deleteTodo: boolean 
 export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetUsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: string, name: string, email: string, todos: Array<{ __typename?: 'Todo', id: string, title: string, completed: boolean }> }> };
+export type GetUsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: string, name: string, email: string }> };
 
 export type CreateUserMutationVariables = Exact<{
   input: CreateUserInput;
 }>;
 
 
-export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', id: string, name: string, email: string, todos: Array<{ __typename?: 'Todo', id: string, title: string, completed: boolean }> } };
+export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', id: string, name: string, email: string } };
 
 export type UpdateUserMutationVariables = Exact<{
   input: UpdateUserInput;
 }>;
 
 
-export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: string, name: string, email: string, todos: Array<{ __typename?: 'Todo', id: string, title: string, completed: boolean }> } };
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: string, name: string, email: string } };
 
 export type DeleteUserMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -194,7 +194,6 @@ export const useGetTodosQuery = <
       TData = GetTodosQuery,
       TError = unknown
     >(
-      dataSource: { endpoint: string, fetchParams?: RequestInit },
       variables?: GetTodosQueryVariables,
       options?: Omit<UseQueryOptions<GetTodosQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetTodosQuery, TError, TData>['queryKey'] }
     ) => {
@@ -202,7 +201,7 @@ export const useGetTodosQuery = <
     return useQuery<GetTodosQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['GetTodos'] : ['GetTodos', variables],
-    queryFn: fetcher<GetTodosQuery, GetTodosQueryVariables>(dataSource.endpoint, dataSource.fetchParams || {}, GetTodosDocument, variables),
+    queryFn: fetcher<GetTodosQuery, GetTodosQueryVariables>(GetTodosDocument, variables),
     ...options
   }
     )};
@@ -213,7 +212,6 @@ export const useInfiniteGetTodosQuery = <
       TData = InfiniteData<GetTodosQuery>,
       TError = unknown
     >(
-      dataSource: { endpoint: string, fetchParams?: RequestInit },
       variables: GetTodosQueryVariables,
       options: Omit<UseInfiniteQueryOptions<GetTodosQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetTodosQuery, TError, TData>['queryKey'] }
     ) => {
@@ -223,7 +221,7 @@ export const useInfiniteGetTodosQuery = <
     const { queryKey: optionsQueryKey, ...restOptions } = options;
     return {
       queryKey: optionsQueryKey ?? variables === undefined ? ['GetTodos.infinite'] : ['GetTodos.infinite', variables],
-      queryFn: (metaData) => fetcher<GetTodosQuery, GetTodosQueryVariables>(dataSource.endpoint, dataSource.fetchParams || {}, GetTodosDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      queryFn: (metaData) => fetcher<GetTodosQuery, GetTodosQueryVariables>(GetTodosDocument, {...variables, ...(metaData.pageParam ?? {})})(),
       ...restOptions
     }
   })()
@@ -232,7 +230,7 @@ export const useInfiniteGetTodosQuery = <
 useInfiniteGetTodosQuery.getKey = (variables?: GetTodosQueryVariables) => variables === undefined ? ['GetTodos.infinite'] : ['GetTodos.infinite', variables];
 
 
-useGetTodosQuery.fetcher = (dataSource: { endpoint: string, fetchParams?: RequestInit }, variables?: GetTodosQueryVariables) => fetcher<GetTodosQuery, GetTodosQueryVariables>(dataSource.endpoint, dataSource.fetchParams || {}, GetTodosDocument, variables);
+useGetTodosQuery.fetcher = (variables?: GetTodosQueryVariables) => fetcher<GetTodosQuery, GetTodosQueryVariables>(GetTodosDocument, variables);
 
 export const CreateTodoDocument = `
     mutation CreateTodo($input: CreateTodoInput!) {
@@ -241,11 +239,6 @@ export const CreateTodoDocument = `
     title
     completed
     userId
-    user {
-      id
-      name
-      email
-    }
   }
 }
     `;
@@ -253,15 +246,12 @@ export const CreateTodoDocument = `
 export const useCreateTodoMutation = <
       TError = unknown,
       TContext = unknown
-    >(
-      dataSource: { endpoint: string, fetchParams?: RequestInit },
-      options?: UseMutationOptions<CreateTodoMutation, TError, CreateTodoMutationVariables, TContext>
-    ) => {
+    >(options?: UseMutationOptions<CreateTodoMutation, TError, CreateTodoMutationVariables, TContext>) => {
     
     return useMutation<CreateTodoMutation, TError, CreateTodoMutationVariables, TContext>(
       {
     mutationKey: ['CreateTodo'],
-    mutationFn: (variables?: CreateTodoMutationVariables) => fetcher<CreateTodoMutation, CreateTodoMutationVariables>(dataSource.endpoint, dataSource.fetchParams || {}, CreateTodoDocument, variables)(),
+    mutationFn: (variables?: CreateTodoMutationVariables) => fetcher<CreateTodoMutation, CreateTodoMutationVariables>(CreateTodoDocument, variables)(),
     ...options
   }
     )};
@@ -269,7 +259,7 @@ export const useCreateTodoMutation = <
 useCreateTodoMutation.getKey = () => ['CreateTodo'];
 
 
-useCreateTodoMutation.fetcher = (dataSource: { endpoint: string, fetchParams?: RequestInit }, variables: CreateTodoMutationVariables) => fetcher<CreateTodoMutation, CreateTodoMutationVariables>(dataSource.endpoint, dataSource.fetchParams || {}, CreateTodoDocument, variables);
+useCreateTodoMutation.fetcher = (variables: CreateTodoMutationVariables) => fetcher<CreateTodoMutation, CreateTodoMutationVariables>(CreateTodoDocument, variables);
 
 export const UpdateTodoDocument = `
     mutation UpdateTodo($input: UpdateTodoInput!) {
@@ -278,11 +268,6 @@ export const UpdateTodoDocument = `
     title
     completed
     userId
-    user {
-      id
-      name
-      email
-    }
   }
 }
     `;
@@ -290,15 +275,12 @@ export const UpdateTodoDocument = `
 export const useUpdateTodoMutation = <
       TError = unknown,
       TContext = unknown
-    >(
-      dataSource: { endpoint: string, fetchParams?: RequestInit },
-      options?: UseMutationOptions<UpdateTodoMutation, TError, UpdateTodoMutationVariables, TContext>
-    ) => {
+    >(options?: UseMutationOptions<UpdateTodoMutation, TError, UpdateTodoMutationVariables, TContext>) => {
     
     return useMutation<UpdateTodoMutation, TError, UpdateTodoMutationVariables, TContext>(
       {
     mutationKey: ['UpdateTodo'],
-    mutationFn: (variables?: UpdateTodoMutationVariables) => fetcher<UpdateTodoMutation, UpdateTodoMutationVariables>(dataSource.endpoint, dataSource.fetchParams || {}, UpdateTodoDocument, variables)(),
+    mutationFn: (variables?: UpdateTodoMutationVariables) => fetcher<UpdateTodoMutation, UpdateTodoMutationVariables>(UpdateTodoDocument, variables)(),
     ...options
   }
     )};
@@ -306,7 +288,7 @@ export const useUpdateTodoMutation = <
 useUpdateTodoMutation.getKey = () => ['UpdateTodo'];
 
 
-useUpdateTodoMutation.fetcher = (dataSource: { endpoint: string, fetchParams?: RequestInit }, variables: UpdateTodoMutationVariables) => fetcher<UpdateTodoMutation, UpdateTodoMutationVariables>(dataSource.endpoint, dataSource.fetchParams || {}, UpdateTodoDocument, variables);
+useUpdateTodoMutation.fetcher = (variables: UpdateTodoMutationVariables) => fetcher<UpdateTodoMutation, UpdateTodoMutationVariables>(UpdateTodoDocument, variables);
 
 export const DeleteTodoDocument = `
     mutation DeleteTodo($id: ID!) {
@@ -317,15 +299,12 @@ export const DeleteTodoDocument = `
 export const useDeleteTodoMutation = <
       TError = unknown,
       TContext = unknown
-    >(
-      dataSource: { endpoint: string, fetchParams?: RequestInit },
-      options?: UseMutationOptions<DeleteTodoMutation, TError, DeleteTodoMutationVariables, TContext>
-    ) => {
+    >(options?: UseMutationOptions<DeleteTodoMutation, TError, DeleteTodoMutationVariables, TContext>) => {
     
     return useMutation<DeleteTodoMutation, TError, DeleteTodoMutationVariables, TContext>(
       {
     mutationKey: ['DeleteTodo'],
-    mutationFn: (variables?: DeleteTodoMutationVariables) => fetcher<DeleteTodoMutation, DeleteTodoMutationVariables>(dataSource.endpoint, dataSource.fetchParams || {}, DeleteTodoDocument, variables)(),
+    mutationFn: (variables?: DeleteTodoMutationVariables) => fetcher<DeleteTodoMutation, DeleteTodoMutationVariables>(DeleteTodoDocument, variables)(),
     ...options
   }
     )};
@@ -333,7 +312,7 @@ export const useDeleteTodoMutation = <
 useDeleteTodoMutation.getKey = () => ['DeleteTodo'];
 
 
-useDeleteTodoMutation.fetcher = (dataSource: { endpoint: string, fetchParams?: RequestInit }, variables: DeleteTodoMutationVariables) => fetcher<DeleteTodoMutation, DeleteTodoMutationVariables>(dataSource.endpoint, dataSource.fetchParams || {}, DeleteTodoDocument, variables);
+useDeleteTodoMutation.fetcher = (variables: DeleteTodoMutationVariables) => fetcher<DeleteTodoMutation, DeleteTodoMutationVariables>(DeleteTodoDocument, variables);
 
 export const GetUsersDocument = `
     query GetUsers {
@@ -341,11 +320,6 @@ export const GetUsersDocument = `
     id
     name
     email
-    todos {
-      id
-      title
-      completed
-    }
   }
 }
     `;
@@ -354,7 +328,6 @@ export const useGetUsersQuery = <
       TData = GetUsersQuery,
       TError = unknown
     >(
-      dataSource: { endpoint: string, fetchParams?: RequestInit },
       variables?: GetUsersQueryVariables,
       options?: Omit<UseQueryOptions<GetUsersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetUsersQuery, TError, TData>['queryKey'] }
     ) => {
@@ -362,7 +335,7 @@ export const useGetUsersQuery = <
     return useQuery<GetUsersQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['GetUsers'] : ['GetUsers', variables],
-    queryFn: fetcher<GetUsersQuery, GetUsersQueryVariables>(dataSource.endpoint, dataSource.fetchParams || {}, GetUsersDocument, variables),
+    queryFn: fetcher<GetUsersQuery, GetUsersQueryVariables>(GetUsersDocument, variables),
     ...options
   }
     )};
@@ -373,7 +346,6 @@ export const useInfiniteGetUsersQuery = <
       TData = InfiniteData<GetUsersQuery>,
       TError = unknown
     >(
-      dataSource: { endpoint: string, fetchParams?: RequestInit },
       variables: GetUsersQueryVariables,
       options: Omit<UseInfiniteQueryOptions<GetUsersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseInfiniteQueryOptions<GetUsersQuery, TError, TData>['queryKey'] }
     ) => {
@@ -383,7 +355,7 @@ export const useInfiniteGetUsersQuery = <
     const { queryKey: optionsQueryKey, ...restOptions } = options;
     return {
       queryKey: optionsQueryKey ?? variables === undefined ? ['GetUsers.infinite'] : ['GetUsers.infinite', variables],
-      queryFn: (metaData) => fetcher<GetUsersQuery, GetUsersQueryVariables>(dataSource.endpoint, dataSource.fetchParams || {}, GetUsersDocument, {...variables, ...(metaData.pageParam ?? {})})(),
+      queryFn: (metaData) => fetcher<GetUsersQuery, GetUsersQueryVariables>(GetUsersDocument, {...variables, ...(metaData.pageParam ?? {})})(),
       ...restOptions
     }
   })()
@@ -392,7 +364,7 @@ export const useInfiniteGetUsersQuery = <
 useInfiniteGetUsersQuery.getKey = (variables?: GetUsersQueryVariables) => variables === undefined ? ['GetUsers.infinite'] : ['GetUsers.infinite', variables];
 
 
-useGetUsersQuery.fetcher = (dataSource: { endpoint: string, fetchParams?: RequestInit }, variables?: GetUsersQueryVariables) => fetcher<GetUsersQuery, GetUsersQueryVariables>(dataSource.endpoint, dataSource.fetchParams || {}, GetUsersDocument, variables);
+useGetUsersQuery.fetcher = (variables?: GetUsersQueryVariables) => fetcher<GetUsersQuery, GetUsersQueryVariables>(GetUsersDocument, variables);
 
 export const CreateUserDocument = `
     mutation CreateUser($input: CreateUserInput!) {
@@ -400,11 +372,6 @@ export const CreateUserDocument = `
     id
     name
     email
-    todos {
-      id
-      title
-      completed
-    }
   }
 }
     `;
@@ -412,15 +379,12 @@ export const CreateUserDocument = `
 export const useCreateUserMutation = <
       TError = unknown,
       TContext = unknown
-    >(
-      dataSource: { endpoint: string, fetchParams?: RequestInit },
-      options?: UseMutationOptions<CreateUserMutation, TError, CreateUserMutationVariables, TContext>
-    ) => {
+    >(options?: UseMutationOptions<CreateUserMutation, TError, CreateUserMutationVariables, TContext>) => {
     
     return useMutation<CreateUserMutation, TError, CreateUserMutationVariables, TContext>(
       {
     mutationKey: ['CreateUser'],
-    mutationFn: (variables?: CreateUserMutationVariables) => fetcher<CreateUserMutation, CreateUserMutationVariables>(dataSource.endpoint, dataSource.fetchParams || {}, CreateUserDocument, variables)(),
+    mutationFn: (variables?: CreateUserMutationVariables) => fetcher<CreateUserMutation, CreateUserMutationVariables>(CreateUserDocument, variables)(),
     ...options
   }
     )};
@@ -428,7 +392,7 @@ export const useCreateUserMutation = <
 useCreateUserMutation.getKey = () => ['CreateUser'];
 
 
-useCreateUserMutation.fetcher = (dataSource: { endpoint: string, fetchParams?: RequestInit }, variables: CreateUserMutationVariables) => fetcher<CreateUserMutation, CreateUserMutationVariables>(dataSource.endpoint, dataSource.fetchParams || {}, CreateUserDocument, variables);
+useCreateUserMutation.fetcher = (variables: CreateUserMutationVariables) => fetcher<CreateUserMutation, CreateUserMutationVariables>(CreateUserDocument, variables);
 
 export const UpdateUserDocument = `
     mutation UpdateUser($input: UpdateUserInput!) {
@@ -436,11 +400,6 @@ export const UpdateUserDocument = `
     id
     name
     email
-    todos {
-      id
-      title
-      completed
-    }
   }
 }
     `;
@@ -448,15 +407,12 @@ export const UpdateUserDocument = `
 export const useUpdateUserMutation = <
       TError = unknown,
       TContext = unknown
-    >(
-      dataSource: { endpoint: string, fetchParams?: RequestInit },
-      options?: UseMutationOptions<UpdateUserMutation, TError, UpdateUserMutationVariables, TContext>
-    ) => {
+    >(options?: UseMutationOptions<UpdateUserMutation, TError, UpdateUserMutationVariables, TContext>) => {
     
     return useMutation<UpdateUserMutation, TError, UpdateUserMutationVariables, TContext>(
       {
     mutationKey: ['UpdateUser'],
-    mutationFn: (variables?: UpdateUserMutationVariables) => fetcher<UpdateUserMutation, UpdateUserMutationVariables>(dataSource.endpoint, dataSource.fetchParams || {}, UpdateUserDocument, variables)(),
+    mutationFn: (variables?: UpdateUserMutationVariables) => fetcher<UpdateUserMutation, UpdateUserMutationVariables>(UpdateUserDocument, variables)(),
     ...options
   }
     )};
@@ -464,7 +420,7 @@ export const useUpdateUserMutation = <
 useUpdateUserMutation.getKey = () => ['UpdateUser'];
 
 
-useUpdateUserMutation.fetcher = (dataSource: { endpoint: string, fetchParams?: RequestInit }, variables: UpdateUserMutationVariables) => fetcher<UpdateUserMutation, UpdateUserMutationVariables>(dataSource.endpoint, dataSource.fetchParams || {}, UpdateUserDocument, variables);
+useUpdateUserMutation.fetcher = (variables: UpdateUserMutationVariables) => fetcher<UpdateUserMutation, UpdateUserMutationVariables>(UpdateUserDocument, variables);
 
 export const DeleteUserDocument = `
     mutation DeleteUser($id: ID!) {
@@ -475,15 +431,12 @@ export const DeleteUserDocument = `
 export const useDeleteUserMutation = <
       TError = unknown,
       TContext = unknown
-    >(
-      dataSource: { endpoint: string, fetchParams?: RequestInit },
-      options?: UseMutationOptions<DeleteUserMutation, TError, DeleteUserMutationVariables, TContext>
-    ) => {
+    >(options?: UseMutationOptions<DeleteUserMutation, TError, DeleteUserMutationVariables, TContext>) => {
     
     return useMutation<DeleteUserMutation, TError, DeleteUserMutationVariables, TContext>(
       {
     mutationKey: ['DeleteUser'],
-    mutationFn: (variables?: DeleteUserMutationVariables) => fetcher<DeleteUserMutation, DeleteUserMutationVariables>(dataSource.endpoint, dataSource.fetchParams || {}, DeleteUserDocument, variables)(),
+    mutationFn: (variables?: DeleteUserMutationVariables) => fetcher<DeleteUserMutation, DeleteUserMutationVariables>(DeleteUserDocument, variables)(),
     ...options
   }
     )};
@@ -491,4 +444,4 @@ export const useDeleteUserMutation = <
 useDeleteUserMutation.getKey = () => ['DeleteUser'];
 
 
-useDeleteUserMutation.fetcher = (dataSource: { endpoint: string, fetchParams?: RequestInit }, variables: DeleteUserMutationVariables) => fetcher<DeleteUserMutation, DeleteUserMutationVariables>(dataSource.endpoint, dataSource.fetchParams || {}, DeleteUserDocument, variables);
+useDeleteUserMutation.fetcher = (variables: DeleteUserMutationVariables) => fetcher<DeleteUserMutation, DeleteUserMutationVariables>(DeleteUserDocument, variables);

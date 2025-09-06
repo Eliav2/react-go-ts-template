@@ -3,9 +3,7 @@ import { createLink, type LinkComponent } from "@tanstack/react-router";
 import { Button } from "@mui/material";
 import type { ButtonProps } from "@mui/material";
 
-interface NavButtonLinkProps extends ButtonProps<"a"> {
-  // Add any additional props you want to pass to the Button
-}
+type NavButtonLinkProps = ButtonProps<"a">;
 
 const NavButtonLinkComponent = React.forwardRef<
   HTMLAnchorElement,

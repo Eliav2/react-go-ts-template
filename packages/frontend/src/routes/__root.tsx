@@ -6,6 +6,8 @@ import { NavButtonLink } from "../components/NavButtonLink";
 export const Route = createRootRoute({
   component: () => (
     <>
+      <TanStackRouterDevtools initialIsOpen={false} />
+
       <Box
         sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >

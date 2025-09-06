@@ -13,10 +13,15 @@ const config: CodegenConfig = {
       config: {
         reactQueryVersion: 5,
         useTypeImports: true,
-        // fetcher: {
-        //   func: "./fetcher#fetcher",
-        //   isReactHook: false,
-        // },
+        fetcher: {
+          // endpoint is treated as a raw TS expression. Wrap the literal in quotes.
+          endpoint: "'/graphql'",
+          fetchParams: JSON.stringify({
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }),
+        },
         dedupeFragments: true,
         exposeFetcher: true,
         exposeQueryKeys: true,

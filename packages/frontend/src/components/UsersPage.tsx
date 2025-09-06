@@ -17,22 +17,20 @@ import {
   DialogActions,
   IconButton,
   Stack,
+  CircularProgress,
+  Alert,
 } from "@mui/material";
 import { Edit, Delete, Add } from "@mui/icons-material";
+import {
+  useGetUsersQuery,
+  useCreateUserMutation,
+  useUpdateUserMutation,
+  useDeleteUserMutation,
+  type GetUsersQuery,
+} from "../graphql/generated";
+import { useQueryClient } from "@tanstack/react-query";
 
-// Placeholder types - will be replaced with generated types in part 2
-interface User {
-  id: string;
-  name: string;
-  email: string;
-}
-
-// Placeholder data
-const initialUsers: User[] = [
-  { id: "1", name: "John Doe", email: "john@example.com" },
-  { id: "2", name: "Jane Smith", email: "jane@example.com" },
-  { id: "3", name: "Bob Johnson", email: "bob@example.com" },
-];
+type User = NonNullable<GetUsersQuery["users"]>[0];
 
 interface UserForm {
   name: string;
@@ -40,12 +38,47 @@ interface UserForm {
 }
 
 export function UsersPage() {
-  const [users, setUsers] = useState<User[]>(initialUsers);
+  const queryClient = useQueryClient();
+  const { data: usersData, isLoading, error } = useGetUsersQuery();
+  const createUserMutation = useCreateUserMutation({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["GetUsers"] });
+    },
+  });
+  const updateUserMutation = useUpdateUserMutation({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["GetUsers"] });
+    },
+  });
+  const deleteUserMutation = useDeleteUserMutation({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["GetUsers"] });
+    },
+  });
+
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [form, setForm] = useState<UserForm>({ name: "", email: "" });
   const [showDialog, setShowDialog] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const users = usersData?.users || [];
+
+  if (isLoading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert severity="error">
+        Failed to load users: {JSON.stringify(error)}
+      </Alert>
+    );
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!form.name.trim() || !form.email.trim()) {
@@ -53,28 +86,33 @@ export function UsersPage() {
       return;
     }
 
-    if (editingUser) {
-      // Update existing user
-      setUsers((prev) =>
-        prev.map((user) =>
-          user.id === editingUser.id
-            ? { ...user, name: form.name, email: form.email }
-            : user
-        )
-      );
-      setEditingUser(null);
-    } else {
-      // Create new user
-      const newUser: User = {
-        id: Date.now().toString(), // Simple ID generation for placeholder
-        name: form.name,
-        email: form.email,
-      };
-      setUsers((prev) => [...prev, newUser]);
-    }
+    try {
+      if (editingUser) {
+        // Update existing user
+        await updateUserMutation.mutateAsync({
+          input: {
+            id: editingUser.id,
+            name: form.name,
+            email: form.email,
+          },
+        });
+        setEditingUser(null);
+      } else {
+        // Create new user
+        await createUserMutation.mutateAsync({
+          input: {
+            name: form.name,
+            email: form.email,
+          },
+        });
+      }
 
-    setForm({ name: "", email: "" });
-    setShowDialog(false);
+      setForm({ name: "", email: "" });
+      setShowDialog(false);
+    } catch (error) {
+      console.error("Error saving user:", error);
+      alert("Failed to save user. Please try again.");
+    }
   };
 
   const handleEdit = (user: User) => {
@@ -83,13 +121,20 @@ export function UsersPage() {
     setShowDialog(true);
   };
 
-  const handleDelete = (userId: string) => {
+  const handleDelete = async (userId: string) => {
     if (
       window.confirm(
         "Are you sure you want to delete this user? This will unassign them from all todos."
       )
     ) {
-      setUsers((prev) => prev.filter((user) => user.id !== userId));
+      try {
+        await deleteUserMutation.mutateAsync({
+          id: userId,
+        });
+      } catch (error) {
+        console.error("Error deleting user:", error);
+        alert("Failed to delete user. Please try again.");
+      }
     }
   };
 

@@ -20,11 +20,6 @@ mutation CreateTodo($input: CreateTodoInput!) {
     title
     completed
     userId
-    user {
-      id
-      name
-      email
-    }
   }
 }
 
@@ -35,11 +30,6 @@ mutation UpdateTodo($input: UpdateTodoInput!) {
     title
     completed
     userId
-    user {
-      id
-      name
-      email
-    }
   }
 }
 

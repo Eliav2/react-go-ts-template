@@ -4,11 +4,6 @@ query GetUsers {
     id
     name
     email
-    todos {
-      id
-      title
-      completed
-    }
   }
 }
 
@@ -18,11 +13,6 @@ mutation CreateUser($input: CreateUserInput!) {
     id
     name
     email
-    todos {
-      id
-      title
-      completed
-    }
   }
 }
 
@@ -32,11 +22,6 @@ mutation UpdateUser($input: UpdateUserInput!) {
     id
     name
     email
-    todos {
-      id
-      title
-      completed
-    }
   }
 }
 
