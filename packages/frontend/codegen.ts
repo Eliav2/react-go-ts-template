@@ -4,10 +4,25 @@ const config: CodegenConfig = {
   schema: "../../api/schema/**/*.graphqls",
   documents: "src/queries/**/*.gql",
   generates: {
-    "src/generated/graphql.ts": {
-      plugins: ["typescript", "typescript-operations", "typescript-react-query"],
+    "src/graphql/generated.ts": {
+      plugins: [
+        "typescript",
+        "typescript-operations",
+        "typescript-react-query",
+      ],
       config: {
-        fetcher: "fetch",
+        reactQueryVersion: 5,
+        useTypeImports: true,
+        // fetcher: {
+        //   func: "./fetcher#fetcher",
+        //   isReactHook: false,
+        // },
+        dedupeFragments: true,
+        exposeFetcher: true,
+        exposeQueryKeys: true,
+        exposeMutationKeys: true,
+        addInfiniteQuery: true,
+        legacyMode: false,
       },
     },
   },

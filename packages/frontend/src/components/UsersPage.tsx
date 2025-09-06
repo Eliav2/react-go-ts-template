@@ -1,4 +1,24 @@
 import { useState } from "react";
+import {
+  Box,
+  Typography,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+  Stack,
+} from "@mui/material";
+import { Edit, Delete, Add } from "@mui/icons-material";
 
 // Placeholder types - will be replaced with generated types in part 2
 interface User {
@@ -23,7 +43,7 @@ export function UsersPage() {
   const [users, setUsers] = useState<User[]>(initialUsers);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [form, setForm] = useState<UserForm>({ name: "", email: "" });
-  const [showForm, setShowForm] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,13 +74,13 @@ export function UsersPage() {
     }
 
     setForm({ name: "", email: "" });
-    setShowForm(false);
+    setShowDialog(false);
   };
 
   const handleEdit = (user: User) => {
     setEditingUser(user);
     setForm({ name: user.name, email: user.email });
-    setShowForm(true);
+    setShowDialog(true);
   };
 
   const handleDelete = (userId: string) => {
@@ -76,36 +96,89 @@ export function UsersPage() {
   const handleCancel = () => {
     setEditingUser(null);
     setForm({ name: "", email: "" });
-    setShowForm(false);
+    setShowDialog(false);
+  };
+
+  const handleOpenDialog = () => {
+    setEditingUser(null);
+    setForm({ name: "", email: "" });
+    setShowDialog(true);
   };
 
   return (
-    <div>
-      <div
-        style={{
-          marginBottom: "2rem",
+    <Box>
+      <Box
+        sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          mb: 3,
         }}
       >
-        <h3>Manage Users</h3>
-        {!showForm && (
-          <button className="btn btn-primary" onClick={() => setShowForm(true)}>
-            Add New User
-          </button>
-        )}
-      </div>
+        <Typography variant="h4" component="h2" sx={{ color: "primary.main" }}>
+          Manage Users
+        </Typography>
+        <Button
+          variant="contained"
+          startIcon={<Add />}
+          onClick={handleOpenDialog}
+        >
+          Add New User
+        </Button>
+      </Box>
 
-      {showForm && (
-        <div className="form">
-          <h4>{editingUser ? "Edit User" : "Create New User"}</h4>
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label className="form-label">Name</label>
-              <input
-                type="text"
-                className="form-input"
+      <TableContainer component={Paper} sx={{ boxShadow: 2 }}>
+        <Table sx={{ minWidth: 650 }}>
+          <TableHead>
+            <TableRow sx={{ backgroundColor: "grey.100" }}>
+              <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Email</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {users.map((user) => (
+              <TableRow
+                key={user.id}
+                sx={{ "&:hover": { backgroundColor: "grey.50" } }}
+              >
+                <TableCell>{user.name}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>
+                  <Stack direction="row" spacing={1}>
+                    <IconButton
+                      size="small"
+                      color="primary"
+                      onClick={() => handleEdit(user)}
+                    >
+                      <Edit />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      onClick={() => handleDelete(user.id)}
+                    >
+                      <Delete />
+                    </IconButton>
+                  </Stack>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      <Dialog open={showDialog} onClose={handleCancel} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          {editingUser ? "Edit User" : "Create New User"}
+        </DialogTitle>
+        <form onSubmit={handleSubmit}>
+          <DialogContent>
+            <Stack spacing={3} sx={{ mt: 1 }}>
+              <TextField
+                label="Name"
+                variant="outlined"
+                fullWidth
                 value={form.name}
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, name: e.target.value }))
@@ -113,12 +186,11 @@ export function UsersPage() {
                 placeholder="Enter user name"
                 required
               />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Email</label>
-              <input
+              <TextField
+                label="Email"
                 type="email"
-                className="form-input"
+                variant="outlined"
+                fullWidth
                 value={form.email}
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, email: e.target.value }))
@@ -126,58 +198,18 @@ export function UsersPage() {
                 placeholder="Enter user email"
                 required
               />
-            </div>
-            <div style={{ display: "flex", gap: "1rem" }}>
-              <button type="submit" className="btn btn-primary">
-                {editingUser ? "Update User" : "Create User"}
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={handleCancel}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      <div className="table-container">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>
-                  <div style={{ display: "flex", gap: "0.5rem" }}>
-                    <button
-                      className="btn btn-small btn-secondary"
-                      onClick={() => handleEdit(user)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="btn btn-small btn-danger"
-                      onClick={() => handleDelete(user.id)}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+            </Stack>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCancel} color="secondary">
+              Cancel
+            </Button>
+            <Button type="submit" variant="contained" color="primary">
+              {editingUser ? "Update User" : "Create User"}
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
+    </Box>
   );
 }

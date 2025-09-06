@@ -1,4 +1,7 @@
-export const fetcher = <TData, TVariables>(query: string, variables?: TVariables) => {
+export const fetcher = <TData, TVariables>(
+  query: string,
+  variables?: TVariables
+) => {
   return async (): Promise<TData> => {
     const res = await fetch("/graphql", {
       method: "POST",

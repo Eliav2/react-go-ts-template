@@ -11,4 +11,12 @@ export default defineConfig({
     }),
     react(),
   ],
+  server: {
+    proxy: {
+      "/graphql": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+      },
+    },
+  },
 });

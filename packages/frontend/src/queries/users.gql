@@ -1,0 +1,46 @@
+# Query to get all users
+query GetUsers {
+  users {
+    id
+    name
+    email
+    todos {
+      id
+      title
+      completed
+    }
+  }
+}
+
+# Mutation to create a new user
+mutation CreateUser($input: CreateUserInput!) {
+  createUser(input: $input) {
+    id
+    name
+    email
+    todos {
+      id
+      title
+      completed
+    }
+  }
+}
+
+# Mutation to update an existing user
+mutation UpdateUser($input: UpdateUserInput!) {
+  updateUser(input: $input) {
+    id
+    name
+    email
+    todos {
+      id
+      title
+      completed
+    }
+  }
+}
+
+# Mutation to delete a user
+mutation DeleteUser($id: ID!) {
+  deleteUser(id: $id)
+}

@@ -1,0 +1,49 @@
+# Query to get all todos
+query GetTodos {
+  todos {
+    id
+    title
+    completed
+    userId
+    user {
+      id
+      name
+      email
+    }
+  }
+}
+
+# Mutation to create a new todo
+mutation CreateTodo($input: CreateTodoInput!) {
+  createTodo(input: $input) {
+    id
+    title
+    completed
+    userId
+    user {
+      id
+      name
+      email
+    }
+  }
+}
+
+# Mutation to update an existing todo
+mutation UpdateTodo($input: UpdateTodoInput!) {
+  updateTodo(input: $input) {
+    id
+    title
+    completed
+    userId
+    user {
+      id
+      name
+      email
+    }
+  }
+}
+
+# Mutation to delete a todo
+mutation DeleteTodo($id: ID!) {
+  deleteTodo(id: $id)
+}

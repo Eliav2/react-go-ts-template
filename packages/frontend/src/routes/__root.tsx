@@ -1,36 +1,37 @@
-import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
+import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-import "../App.css";
+import { AppBar, Toolbar, Typography, Container, Box } from "@mui/material";
+import { NavButtonLink } from "../components/NavButtonLink";
 
 export const Route = createRootRoute({
   component: () => (
     <>
-      <div className="app">
-        <nav className="nav">
-          <div className="nav-brand">
-            <h1>Todo Manager</h1>
-          </div>
-          <div className="nav-links">
-            <Link
-              to="/"
-              className="nav-link"
-              activeProps={{ className: "active" }}
-            >
-              Todos
-            </Link>
-            <Link
-              to="/users"
-              className="nav-link"
-              activeProps={{ className: "active" }}
-            >
-              Users
-            </Link>
-          </div>
-        </nav>
-        <main className="main">
+      <Box
+        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+      >
+        <AppBar position="static">
+          <Toolbar>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              Todo Manager
+            </Typography>
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <NavButtonLink to="/">Todos</NavButtonLink>
+              <NavButtonLink to="/users">Users</NavButtonLink>
+            </Box>
+          </Toolbar>
+        </AppBar>
+        <Container
+          maxWidth={false}
+          sx={{
+            flex: 1,
+            py: 3,
+            backgroundColor: "grey.50",
+            width: "100%",
+          }}
+        >
           <Outlet />
-        </main>
-      </div>
+        </Container>
+      </Box>
       <TanStackRouterDevtools />
     </>
   ),

@@ -1,4 +1,18 @@
 import { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Select,
+  MenuItem,
+  FormControl,
+  Button,
+  Chip,
+} from "@mui/material";
 
 // Placeholder types - will be replaced with generated types in part 2
 interface Todo {
@@ -89,59 +103,64 @@ export function TodosTable() {
   };
 
   return (
-    <div className="table-container">
-      <table className="table">
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Status</th>
-            <th>Assigned User</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
+    <TableContainer component={Paper} sx={{ boxShadow: 2 }}>
+      <Table sx={{ minWidth: 650 }}>
+        <TableHead>
+          <TableRow sx={{ backgroundColor: "grey.100" }}>
+            <TableCell sx={{ fontWeight: "bold" }}>Title</TableCell>
+            <TableCell sx={{ fontWeight: "bold" }}>Status</TableCell>
+            <TableCell sx={{ fontWeight: "bold" }}>Assigned User</TableCell>
+            <TableCell sx={{ fontWeight: "bold" }}>Actions</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
           {todos.map((todo) => (
-            <tr key={todo.id}>
-              <td>{todo.title}</td>
-              <td>
-                <span
-                  className={
-                    todo.completed ? "status-completed" : "status-pending"
-                  }
-                >
-                  {todo.completed ? "Completed" : "Pending"}
-                </span>
-              </td>
-              <td>
-                <select
-                  className="form-select"
-                  value={todo.userId || ""}
-                  onChange={(e) =>
-                    handleAssignUser(todo.id, e.target.value || null)
-                  }
-                >
-                  <option value="">Unassigned</option>
-                  {placeholderUsers.map((user) => (
-                    <option key={user.id} value={user.id}>
-                      {user.name}
-                    </option>
-                  ))}
-                </select>
-              </td>
-              <td>
-                <button
-                  className={`btn btn-small ${
-                    todo.completed ? "btn-secondary" : "btn-primary"
-                  }`}
+            <TableRow
+              key={todo.id}
+              sx={{ "&:hover": { backgroundColor: "grey.50" } }}
+            >
+              <TableCell>{todo.title}</TableCell>
+              <TableCell>
+                <Chip
+                  label={todo.completed ? "Completed" : "Pending"}
+                  color={todo.completed ? "success" : "warning"}
+                  size="small"
+                />
+              </TableCell>
+              <TableCell>
+                <FormControl size="small" sx={{ minWidth: 150 }}>
+                  <Select
+                    value={todo.userId || ""}
+                    onChange={(e) =>
+                      handleAssignUser(todo.id, e.target.value || null)
+                    }
+                    displayEmpty
+                  >
+                    <MenuItem value="">
+                      <em>Unassigned</em>
+                    </MenuItem>
+                    {placeholderUsers.map((user) => (
+                      <MenuItem key={user.id} value={user.id}>
+                        {user.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </TableCell>
+              <TableCell>
+                <Button
+                  variant={todo.completed ? "outlined" : "contained"}
+                  color={todo.completed ? "secondary" : "primary"}
+                  size="small"
                   onClick={() => handleToggleCompleted(todo.id)}
                 >
                   {todo.completed ? "Mark Pending" : "Mark Complete"}
-                </button>
-              </td>
-            </tr>
+                </Button>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 }
