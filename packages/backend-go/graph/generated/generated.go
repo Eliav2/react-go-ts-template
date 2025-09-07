@@ -387,6 +387,7 @@ input UpdateTodoInput {
   id: ID!
   title: String
   done: Boolean
+  userId: ID
 }
 
 type Mutation {
@@ -3612,7 +3613,7 @@ func (ec *executionContext) unmarshalInputUpdateTodoInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "title", "done"}
+	fieldsInOrder := [...]string{"id", "title", "done", "userId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3640,6 +3641,13 @@ func (ec *executionContext) unmarshalInputUpdateTodoInput(ctx context.Context, o
 				return it, err
 			}
 			it.Done = data
+		case "userId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
+			data, err := ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserID = data
 		}
 	}
 

@@ -27,9 +27,10 @@ type Todo struct {
 }
 
 type UpdateTodoInput struct {
-	ID    string  `json:"id"`
-	Title *string `json:"title,omitempty"`
-	Done  *bool   `json:"done,omitempty"`
+	ID     string  `json:"id"`
+	Title  *string `json:"title,omitempty"`
+	Done   *bool   `json:"done,omitempty"`
+	UserID *string `json:"userId,omitempty"`
 }
 
 type UpdateUserInput struct {

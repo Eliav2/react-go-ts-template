@@ -104,6 +104,7 @@ export type UpdateTodoInput = {
   done?: InputMaybe<Scalars['Boolean']['input']>;
   id: Scalars['ID']['input'];
   title?: InputMaybe<Scalars['String']['input']>;
+  userId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type UpdateUserInput = {

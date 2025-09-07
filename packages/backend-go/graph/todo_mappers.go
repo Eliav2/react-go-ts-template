@@ -1,6 +1,7 @@
 package graph
 
 import (
+	"context"
 	"fmt"
 
 	"backend-go/ent"
@@ -43,7 +44,7 @@ func downstreamTodoMapper(entTodo *ent.Todo) *model.Todo {
 // =============================================================================
 
 // upstreamCreateTodoMapper prepares a todo creation operation from GraphQL input
-func upstreamCreateTodoMapper(client *ent.Client, input model.CreateTodoInput) *ent.TodoCreate {
+func upstreamCreateTodoMapper(client *ent.Client, input model.CreateTodoInput) (*ent.TodoCreate, error) {
 	createQuery := client.Todo.
 		Create().
 		SetTitle(input.Title)
@@ -52,11 +53,16 @@ func upstreamCreateTodoMapper(client *ent.Client, input model.CreateTodoInput) *
 	if input.UserID != nil {
 		userID, err := uuid.Parse(*input.UserID)
 		if err == nil { // Only set if valid UUID
+			// make sure the user exists
+			_, err = client.User.Get(context.Background(), userID)
+			if err != nil {
+				return nil, fmt.Errorf("user with id %s not found", userID)
+			}
 			createQuery = createQuery.SetUserID(userID)
 		}
 	}
 
-	return createQuery
+	return createQuery, nil
 }
 
 // upstreamUpdateTodoMapper prepares a todo update operation from GraphQL input
@@ -73,6 +79,17 @@ func upstreamUpdateTodoMapper(client *ent.Client, input model.UpdateTodoInput) (
 	}
 	if input.Done != nil {
 		updateQuery = updateQuery.SetCompleted(*input.Done)
+	}
+	if input.UserID != nil {
+		userID, err := uuid.Parse(*input.UserID)
+		if err == nil { // Only set if valid UUID
+			// make sure the user exists
+			_, err = client.User.Get(context.Background(), userID)
+			if err != nil {
+				return nil, fmt.Errorf("user with id %s not found", userID)
+			}
+			updateQuery = updateQuery.SetUserID(userID)
+		}
 	}
 
 	return updateQuery, nil

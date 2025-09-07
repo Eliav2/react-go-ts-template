@@ -1,6 +1,6 @@
-.PHONY: dev build generate clean
+.PHONY: dev dev-simple build generate clean deps
 
-# Development server with hot reload
+# Development with hot reload and codegen watch (like frontend)
 dev:
 	@if [ -f .env ]; then export $$(cat .env | xargs); fi && go run main.go
 
@@ -10,7 +10,7 @@ build:
 
 # Generate GraphQL code from schema
 generate:
-	go run github.com/99designs/gqlgen generate
+	go run -mod=mod github.com/99designs/gqlgen generate
 
 # Generate Ent code from schema
 ent-generate:

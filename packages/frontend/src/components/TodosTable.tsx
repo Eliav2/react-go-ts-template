@@ -101,17 +101,17 @@ export function TodosTable() {
   };
 
   const handleAssignUser = async (todoId: string, userId: string | null) => {
-    // TODO: The current UpdateTodoInput schema doesn't support userId updates
-    // This will need to be implemented in the backend schema
-    console.log("User assignment not yet implemented in backend schema:", {
-      todoId,
-      userId,
-    });
-
-    // For now, we'll just show a placeholder alert
-    alert(
-      "User assignment feature requires backend schema update. See UpdateTodoInput in schema."
-    );
+    try {
+      await updateTodoMutation.mutateAsync({
+        input: {
+          id: todoId,
+          userId: userId,
+        },
+      });
+    } catch (error) {
+      console.error("Failed to assign user:", error);
+      alert("Failed to assign user. Please try again.");
+    }
   };
 
   const handleToggleCompleted = async (

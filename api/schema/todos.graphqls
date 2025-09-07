@@ -19,6 +19,7 @@ input UpdateTodoInput {
   id: ID!
   title: String
   done: Boolean
+  userId: ID
 }
 
 type Mutation {

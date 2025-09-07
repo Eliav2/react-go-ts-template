@@ -18,7 +18,10 @@ import (
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.CreateTodoInput) (*model.Todo, error) {
 	// Use upstream mapper to prepare the creation operation
-	createQuery := upstreamCreateTodoMapper(r.Client, input)
+	createQuery, err := upstreamCreateTodoMapper(r.Client, input)
+	if err != nil {
+		return nil, err
+	}
 
 	entTodo, err := createQuery.Save(ctx)
 	if err != nil {
