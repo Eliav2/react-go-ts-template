@@ -1,8 +1,8 @@
 .PHONY: dev dev-simple build generate clean deps
 
-# Development with hot reload and codegen watch (like frontend)
+# Development with hot reload using Air
 dev:
-	@if [ -f .env ]; then export $$(cat .env | xargs); fi && go run main.go
+	@if [ -f .env ]; then export $$(cat .env | xargs); fi && air
 
 # Build the application
 build:

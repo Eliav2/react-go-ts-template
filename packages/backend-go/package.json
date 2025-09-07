@@ -1,0 +1,13 @@
+{
+  "name": "backend-go",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "make dev",
+    "build": "make build",
+    "test": "make test",
+    "clean": "make clean",
+    "generate": "make generate",
+    "ent-generate": "make ent-generate"
+  }
+}
