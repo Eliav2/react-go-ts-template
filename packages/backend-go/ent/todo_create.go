@@ -41,6 +41,20 @@ func (_c *TodoCreate) SetNillableCompleted(v *bool) *TodoCreate {
 	return _c
 }
 
+// SetUserID sets the "user_id" field.
+func (_c *TodoCreate) SetUserID(v uuid.UUID) *TodoCreate {
+	_c.mutation.SetUserID(v)
+	return _c
+}
+
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (_c *TodoCreate) SetNillableUserID(v *uuid.UUID) *TodoCreate {
+	if v != nil {
+		_c.SetUserID(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *TodoCreate) SetID(v uuid.UUID) *TodoCreate {
 	_c.mutation.SetID(v)
@@ -51,20 +65,6 @@ func (_c *TodoCreate) SetID(v uuid.UUID) *TodoCreate {
 func (_c *TodoCreate) SetNillableID(v *uuid.UUID) *TodoCreate {
 	if v != nil {
 		_c.SetID(*v)
-	}
-	return _c
-}
-
-// SetUserID sets the "user" edge to the User entity by ID.
-func (_c *TodoCreate) SetUserID(id uuid.UUID) *TodoCreate {
-	_c.mutation.SetUserID(id)
-	return _c
-}
-
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (_c *TodoCreate) SetNillableUserID(id *uuid.UUID) *TodoCreate {
-	if id != nil {
-		_c = _c.SetUserID(*id)
 	}
 	return _c
 }
@@ -189,7 +189,7 @@ func (_c *TodoCreate) createSpec() (*Todo, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.user_todos = &nodes[0]
+		_node.UserID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

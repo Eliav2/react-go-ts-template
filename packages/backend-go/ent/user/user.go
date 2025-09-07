@@ -27,7 +27,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "todo" package.
 	TodosInverseTable = "todos"
 	// TodosColumn is the table column denoting the todos relation/edge.
-	TodosColumn = "user_todos"
+	TodosColumn = "user_id"
 )
 
 // Columns holds all SQL columns for user fields.

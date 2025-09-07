@@ -1,15 +1,13 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import "dotenv/config";
-import { drizzle } from "drizzle-orm/node-postgres";
 import { todosTable } from "./db/schema";
 import { createYoga } from "graphql-yoga";
 import { createSchema } from "graphql-yoga";
-import { resolvers } from "./resolvers/resolvers.generated";
+import { resolvers } from "./resolvers";
+import { createContext, Context } from "./context";
 import { readFileSync } from "fs";
 import { join } from "path";
-
-const db = drizzle(process.env.DATABASE_URL!);
 
 const app = new Hono();
 
@@ -22,20 +20,31 @@ app.use(
   })
 );
 
-// Read the schema from the generated file
-const typeDefs = readFileSync(join(__dirname, "resolvers/schema.generated.graphqls"), "utf8");
+const rootPath = join(__dirname, "../../..");
+
+// Read the schema files directly from the API directory
+const todosSchema = readFileSync(
+  join(rootPath, "api/schema/todos.graphqls"),
+  "utf8"
+);
+const usersSchema = readFileSync(
+  join(rootPath, "api/schema/users.graphqls"),
+  "utf8"
+);
+const typeDefs = [todosSchema, usersSchema];
 
 // Create GraphQL schema
-const schema = createSchema({
+const schema = createSchema<Context>({
   typeDefs,
   resolvers,
 });
 
 // Create GraphQL Yoga instance
-const yoga = createYoga({
+const yoga = createYoga<Context>({
   schema,
   graphqlEndpoint: "/graphql",
   landingPage: false,
+  context: () => createContext(),
 });
 
 // Add GraphQL endpoint
@@ -50,13 +59,18 @@ app.get("/", (c) => {
 
 // REST endpoints (keep for comparison)
 app.get("/api/todos", async (c) => {
-  const todos = db.select().from(todosTable);
+  const { db } = createContext();
+  const todos = await db.select().from(todosTable);
   return c.json(todos);
 });
 
 app.post("/api/todos", async (c) => {
+  const { db } = createContext();
   const { title } = await c.req.json();
-  const todo = db.insert(todosTable).values({ title });
+  const [todo] = await db
+    .insert(todosTable)
+    .values({ title, completed: false })
+    .returning();
   return c.json(todo);
 });
 

@@ -221,27 +221,64 @@ func (m *TodoMutation) ResetCompleted() {
 	m.completed = nil
 }
 
-// SetUserID sets the "user" edge to the User entity by id.
-func (m *TodoMutation) SetUserID(id uuid.UUID) {
-	m.user = &id
+// SetUserID sets the "user_id" field.
+func (m *TodoMutation) SetUserID(u uuid.UUID) {
+	m.user = &u
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *TodoMutation) UserID() (r uuid.UUID, exists bool) {
+	v := m.user
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserID returns the old "user_id" field's value of the Todo entity.
+// If the Todo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TodoMutation) OldUserID(ctx context.Context) (v *uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+	}
+	return oldValue.UserID, nil
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (m *TodoMutation) ClearUserID() {
+	m.user = nil
+	m.clearedFields[todo.FieldUserID] = struct{}{}
+}
+
+// UserIDCleared returns if the "user_id" field was cleared in this mutation.
+func (m *TodoMutation) UserIDCleared() bool {
+	_, ok := m.clearedFields[todo.FieldUserID]
+	return ok
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *TodoMutation) ResetUserID() {
+	m.user = nil
+	delete(m.clearedFields, todo.FieldUserID)
 }
 
 // ClearUser clears the "user" edge to the User entity.
 func (m *TodoMutation) ClearUser() {
 	m.cleareduser = true
+	m.clearedFields[todo.FieldUserID] = struct{}{}
 }
 
 // UserCleared reports if the "user" edge to the User entity was cleared.
 func (m *TodoMutation) UserCleared() bool {
-	return m.cleareduser
-}
-
-// UserID returns the "user" edge ID in the mutation.
-func (m *TodoMutation) UserID() (id uuid.UUID, exists bool) {
-	if m.user != nil {
-		return *m.user, true
-	}
-	return
+	return m.UserIDCleared() || m.cleareduser
 }
 
 // UserIDs returns the "user" edge IDs in the mutation.
@@ -294,12 +331,15 @@ func (m *TodoMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TodoMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 3)
 	if m.title != nil {
 		fields = append(fields, todo.FieldTitle)
 	}
 	if m.completed != nil {
 		fields = append(fields, todo.FieldCompleted)
+	}
+	if m.user != nil {
+		fields = append(fields, todo.FieldUserID)
 	}
 	return fields
 }
@@ -313,6 +353,8 @@ func (m *TodoMutation) Field(name string) (ent.Value, bool) {
 		return m.Title()
 	case todo.FieldCompleted:
 		return m.Completed()
+	case todo.FieldUserID:
+		return m.UserID()
 	}
 	return nil, false
 }
@@ -326,6 +368,8 @@ func (m *TodoMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldTitle(ctx)
 	case todo.FieldCompleted:
 		return m.OldCompleted(ctx)
+	case todo.FieldUserID:
+		return m.OldUserID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Todo field %s", name)
 }
@@ -348,6 +392,13 @@ func (m *TodoMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCompleted(v)
+		return nil
+	case todo.FieldUserID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Todo field %s", name)
@@ -378,7 +429,11 @@ func (m *TodoMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *TodoMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(todo.FieldUserID) {
+		fields = append(fields, todo.FieldUserID)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -391,6 +446,11 @@ func (m *TodoMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *TodoMutation) ClearField(name string) error {
+	switch name {
+	case todo.FieldUserID:
+		m.ClearUserID()
+		return nil
+	}
 	return fmt.Errorf("unknown Todo nullable field %s", name)
 }
 
@@ -403,6 +463,9 @@ func (m *TodoMutation) ResetField(name string) error {
 		return nil
 	case todo.FieldCompleted:
 		m.ResetCompleted()
+		return nil
+	case todo.FieldUserID:
+		m.ResetUserID()
 		return nil
 	}
 	return fmt.Errorf("unknown Todo field %s", name)

@@ -13,11 +13,18 @@ export default defineConfig({
   ],
   server: {
     proxy: {
+      // go backend
       "/graphql": {
         target: "http://localhost:8080",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/graphql/, "/query"),
       },
+      // // ts backend
+      // "/graphql": {
+      //   target: "http://localhost:3000",
+      //   changeOrigin: true,
+      //   // rewrite: (path) => path.replace(/^\/graphql/, "/query"),
+      // },
     },
   },
 });

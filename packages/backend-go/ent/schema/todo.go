@@ -26,6 +26,9 @@ func (Todo) Fields() []ent.Field {
 			NotEmpty(),
 		field.Bool("completed").
 			Default(false),
+		field.UUID("user_id", uuid.UUID{}).
+			Optional().
+			Nillable(),
 	}
 }
 
@@ -34,6 +37,7 @@ func (Todo) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("user", User.Type).
 			Ref("todos").
+			Field("user_id").
 			Unique(),
 	}
 }

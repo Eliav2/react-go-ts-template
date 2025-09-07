@@ -57,17 +57,23 @@ func (_u *TodoUpdate) SetNillableCompleted(v *bool) *TodoUpdate {
 	return _u
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (_u *TodoUpdate) SetUserID(id uuid.UUID) *TodoUpdate {
-	_u.mutation.SetUserID(id)
+// SetUserID sets the "user_id" field.
+func (_u *TodoUpdate) SetUserID(v uuid.UUID) *TodoUpdate {
+	_u.mutation.SetUserID(v)
 	return _u
 }
 
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (_u *TodoUpdate) SetNillableUserID(id *uuid.UUID) *TodoUpdate {
-	if id != nil {
-		_u = _u.SetUserID(*id)
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (_u *TodoUpdate) SetNillableUserID(v *uuid.UUID) *TodoUpdate {
+	if v != nil {
+		_u.SetUserID(*v)
 	}
+	return _u
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (_u *TodoUpdate) ClearUserID() *TodoUpdate {
+	_u.mutation.ClearUserID()
 	return _u
 }
 
@@ -219,17 +225,23 @@ func (_u *TodoUpdateOne) SetNillableCompleted(v *bool) *TodoUpdateOne {
 	return _u
 }
 
-// SetUserID sets the "user" edge to the User entity by ID.
-func (_u *TodoUpdateOne) SetUserID(id uuid.UUID) *TodoUpdateOne {
-	_u.mutation.SetUserID(id)
+// SetUserID sets the "user_id" field.
+func (_u *TodoUpdateOne) SetUserID(v uuid.UUID) *TodoUpdateOne {
+	_u.mutation.SetUserID(v)
 	return _u
 }
 
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (_u *TodoUpdateOne) SetNillableUserID(id *uuid.UUID) *TodoUpdateOne {
-	if id != nil {
-		_u = _u.SetUserID(*id)
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (_u *TodoUpdateOne) SetNillableUserID(v *uuid.UUID) *TodoUpdateOne {
+	if v != nil {
+		_u.SetUserID(*v)
 	}
+	return _u
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (_u *TodoUpdateOne) ClearUserID() *TodoUpdateOne {
+	_u.mutation.ClearUserID()
 	return _u
 }
 

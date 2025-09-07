@@ -414,7 +414,9 @@ func (_q *UserQuery) loadTodos(ctx context.Context, query *TodoQuery, nodes []*U
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(todo.FieldUserID)
+	}
 	query.Where(predicate.Todo(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(user.TodosColumn), fks...))
 	}))
@@ -423,13 +425,13 @@ func (_q *UserQuery) loadTodos(ctx context.Context, query *TodoQuery, nodes []*U
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.user_todos
+		fk := n.UserID
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "user_todos" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "user_id" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "user_todos" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

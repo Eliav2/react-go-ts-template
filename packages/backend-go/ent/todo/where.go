@@ -65,6 +65,11 @@ func Completed(v bool) predicate.Todo {
 	return predicate.Todo(sql.FieldEQ(FieldCompleted, v))
 }
 
+// UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
+func UserID(v uuid.UUID) predicate.Todo {
+	return predicate.Todo(sql.FieldEQ(FieldUserID, v))
+}
+
 // TitleEQ applies the EQ predicate on the "title" field.
 func TitleEQ(v string) predicate.Todo {
 	return predicate.Todo(sql.FieldEQ(FieldTitle, v))
@@ -138,6 +143,36 @@ func CompletedEQ(v bool) predicate.Todo {
 // CompletedNEQ applies the NEQ predicate on the "completed" field.
 func CompletedNEQ(v bool) predicate.Todo {
 	return predicate.Todo(sql.FieldNEQ(FieldCompleted, v))
+}
+
+// UserIDEQ applies the EQ predicate on the "user_id" field.
+func UserIDEQ(v uuid.UUID) predicate.Todo {
+	return predicate.Todo(sql.FieldEQ(FieldUserID, v))
+}
+
+// UserIDNEQ applies the NEQ predicate on the "user_id" field.
+func UserIDNEQ(v uuid.UUID) predicate.Todo {
+	return predicate.Todo(sql.FieldNEQ(FieldUserID, v))
+}
+
+// UserIDIn applies the In predicate on the "user_id" field.
+func UserIDIn(vs ...uuid.UUID) predicate.Todo {
+	return predicate.Todo(sql.FieldIn(FieldUserID, vs...))
+}
+
+// UserIDNotIn applies the NotIn predicate on the "user_id" field.
+func UserIDNotIn(vs ...uuid.UUID) predicate.Todo {
+	return predicate.Todo(sql.FieldNotIn(FieldUserID, vs...))
+}
+
+// UserIDIsNil applies the IsNil predicate on the "user_id" field.
+func UserIDIsNil() predicate.Todo {
+	return predicate.Todo(sql.FieldIsNull(FieldUserID))
+}
+
+// UserIDNotNil applies the NotNil predicate on the "user_id" field.
+func UserIDNotNil() predicate.Todo {
+	return predicate.Todo(sql.FieldNotNull(FieldUserID))
 }
 
 // HasUser applies the HasEdge predicate on the "user" edge.

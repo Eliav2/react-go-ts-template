@@ -22,10 +22,11 @@ type Todo struct {
 	Title string `json:"title,omitempty"`
 	// Completed holds the value of the "completed" field.
 	Completed bool `json:"completed,omitempty"`
+	// UserID holds the value of the "user_id" field.
+	UserID *uuid.UUID `json:"user_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TodoQuery when eager-loading is set.
 	Edges        TodoEdges `json:"edges"`
-	user_todos   *uuid.UUID
 	selectValues sql.SelectValues
 }
 
@@ -54,14 +55,14 @@ func (*Todo) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case todo.FieldUserID:
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		case todo.FieldCompleted:
 			values[i] = new(sql.NullBool)
 		case todo.FieldTitle:
 			values[i] = new(sql.NullString)
 		case todo.FieldID:
 			values[i] = new(uuid.UUID)
-		case todo.ForeignKeys[0]: // user_todos
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -95,12 +96,12 @@ func (_m *Todo) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Completed = value.Bool
 			}
-		case todo.ForeignKeys[0]:
+		case todo.FieldUserID:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
-				return fmt.Errorf("unexpected type %T for field user_todos", values[i])
+				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				_m.user_todos = new(uuid.UUID)
-				*_m.user_todos = *value.S.(*uuid.UUID)
+				_m.UserID = new(uuid.UUID)
+				*_m.UserID = *value.S.(*uuid.UUID)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -148,6 +149,11 @@ func (_m *Todo) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("completed=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Completed))
+	builder.WriteString(", ")
+	if v := _m.UserID; v != nil {
+		builder.WriteString("user_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }
